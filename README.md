@@ -1445,13 +1445,13 @@
                         tr.style.background = rowIndex % 2 === 0 ? '#f8f9fa' : '#fff';
                         tr.innerHTML = `
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${rowIndex}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp${row.reg}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ${row.type}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${row.zone}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp${row.province}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.reg}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.type}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.zone}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.province}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.product}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.plant}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp ${row.job}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp ${row.job}</td>
                         `;
                         tbody.appendChild(tr);
                         rowIndex++;
