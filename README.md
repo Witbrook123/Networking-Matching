@@ -1420,17 +1420,17 @@
             </div>
             <script>
             const truckTableData = [
-                { no: 1, reg: "1กข 1234", type: "Container", zone: "เหนือ", province: "กรุงเทพมหานคร", product: "Food", plant: "Plant A", job: "🟢 งาน SCGJWD" },
-                { no: 2, reg: "2ขค 5678", type: "Flatbed", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
-                { no: 3, reg: "3งจ 9012", type: "Tanker", zone: "กลาง", province: "ชลบุรี", product: "Automotive", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
-                { no: 4, reg: "4จฉ 3456", type: "Refrigerated", zone: "ใต้", province: "ภูเก็ต", product: "Chemicals", plant: "Plant D", job: "🟡 ไม่ได้ลงคิวนอกโซนภาค" },
-                { no: 5, reg: "5ฉช 7890", type: "Container", zone: "อีสาน", province: "ขอนแก่น", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
-                { no: 6, reg: "6ชซ 2345", type: "Flatbed", zone: "อีสาน", province: "ขอนแก่น", product: "Food", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
-                { no: 7, reg: "7ซฌ 6789", type: "Tanker", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
-                { no: 8, reg: "8ฌญ 1234", type: "Refrigerated", zone: "กลาง", province: "ชลบุรี", product: "Food", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
-                { no: 9, reg: "8ฌฌ 9013", type: "Refrigerated Truck", zone: "เหนือ", province: "เชียงใหม่", product: "Food & Beverage", plant: "Plant D", job: "🔴 ไม่ได้ลงคิวนอกโซนภาค" },
-                { no: 10, reg: "9ญญ 3457", type: "Container Truck", zone: "ใต้", province: "ภูเก็ต", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
-                { no: 11, reg: "10ฎฎ 7891", type: "Flatbed Truck", zone: "ตะวันออก", province: "ชลบุรี", product: "Automotive", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" }
+                { no: 1, reg: "1กข-1234", type: "Container", zone: "เหนือ", province: "กรุงเทพมหานคร", product: "Food", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 2, reg: "2ขค-5678", type: "Flatbed", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
+                { no: 3, reg: "3งจ-9012", type: "Tanker", zone: "กลาง", province: "ชลบุรี", product: "Automotive", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 4, reg: "4จฉ-3456", type: "Refrigerated", zone: "ใต้", province: "ภูเก็ต", product: "Chemicals", plant: "Plant D", job: "🟡 ไม่ได้ลงคิวนอกโซนภาค" },
+                { no: 5, reg: "5ฉช-7890", type: "Container", zone: "อีสาน", province: "ขอนแก่น", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 6, reg: "6ชซ-2345", type: "Flatbed", zone: "อีสาน", province: "ขอนแก่น", product: "Food", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
+                { no: 7, reg: "7ซฌ-6789", type: "Tanker", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 8, reg: "8ฌญ-1234", type: "Refrigerated", zone: "กลาง", province: "ชลบุรี", product: "Food", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 9, reg: "8ฌฌ-9013", type: "Refrigerated Truck", zone: "เหนือ", province: "เชียงใหม่", product: "Food & Beverage", plant: "Plant D", job: "🔴 ไม่ได้ลงคิวนอกโซนภาค" },
+                { no: 10, reg: "9ญญ-3457", type: "Container Truck", zone: "ใต้", province: "ภูเก็ต", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 11, reg: "10ฎฎ-7891", type: "Flatbed Truck", zone: "ตะวันออก", province: "ชลบุรี", product: "Automotive", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" }
             ];
 
             function renderTruckTable() {
@@ -1445,13 +1445,13 @@
                         tr.style.background = rowIndex % 2 === 0 ? '#f8f9fa' : '#fff';
                         tr.innerHTML = `
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${rowIndex}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.reg}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.reg}</td>
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.type}</td>
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.zone}</td>
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.province}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.product}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.plant}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp ${row.job}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.job}</td>
                         `;
                         tbody.appendChild(tr);
                         rowIndex++;
