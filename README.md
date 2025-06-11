@@ -1405,7 +1405,7 @@
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ลำดับ</th>
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ทะเบียนรถ</th>
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ประเภทรถ</th>
-                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">&nbsp&nbsp&nbsp&nbspโซนภาค</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">โซนภาค</th>
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">จังหวัด</th>
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ประเภทสินค้า</th>
                                     <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">โรงงานต้นทาง</th>
