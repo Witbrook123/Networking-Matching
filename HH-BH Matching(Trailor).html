@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Overall Networking Dashboard HH : BH Matching</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Modern Google Fonts for Thai/English -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #263238;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .section-title, .chart-title, .preview-title {
+            font-family: 'Prompt', 'Sarabun', 'Segoe UI', Arial, sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .head-haul .section-icon {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .back-haul .section-icon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #84fab0;
+            box-shadow: 0 0 0 3px rgba(132, 250, 176, 0.1);
+        }
+
+        .filter-input:hover {
+            border-color: #ced4da;
+        }
+
+        .calendar-input {
+            position: relative;
+        }
+
+        .calendar-input input[type="date"] {
+            width: 100%;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            align-self: flex-start;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .mockup-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffd700;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .content-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .preview-icon {
+            width: 8px;
+            height: 8px;
+            background: #84fab0;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .preview-text {
+            color: #6c757d;
+            font-style: italic;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #84fab0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f1f3f4;
+        }
+
+        .chart-header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .matching-label {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            border: 1px solid #dee2e6;
+            margin-left: 0.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        .bh-color {
+            background: #4285f4;
+        }
+
+        .hh-color {
+            background: #4285f4;
+        }
+
+        .matching-color {
+            background: #ff9500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+        <div class="mockup-badge">Mockup</div>
+        
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <img src="SCGJWD_Logo.png" alt="SCGJWD Logo" style="height: 64px; width: auto; background: #fff; border-radius: 14px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); display: inline-block; vertical-align: middle;">
+                    <h1 style="display: inline-block; vertical-align: middle; margin: 0;">Overall Networking Dashboard HH : BH Matching</h1>
+                    <p style="margin: 4px 0 0 0; color: #f3e8ff; font-size: 1rem; font-weight: 400; text-shadow: 0 1px 6px #a18cd1cc;">Visualize and manage truck-carrier matching in logistics transportation activities</p>
+                </div>
+            </div>
+        </header>
+
+    <div class="container">
+        <!-- Head-Haul Section -->
+        <div class="filter-section head-haul">
+            <div class="section-header">
+                <div class="section-icon">HH</div>
+                <h2 class="section-title">Head-Haul Filters</h2>
+            </div>
+            
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <div class="calendar-input">
+                        <input type="date" class="filter-input" id="hh-date">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Truck Type</label>
+                    <select class="filter-input" id="hh-truck-type">
+                        <option value="">Select Truck Type</option>
+                        <option value="container">Container Truck</option>
+                        <option value="flatbed">Flatbed Truck</option>
+                        <option value="tanker">Tanker Truck</option>
+                        <option value="refrigerated">Refrigerated Truck</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Head-Haul Zone (Region)</label>
+                    <select class="filter-input" id="hh-zone">
+                        <option value="Select Zone">เลือกโซนภาค</option>
+                        <option value="north">ภาคเหนือ</option>
+                        <option value="northeast">ภาคตะวันออกเฉียงเหนือ</option>
+                        <option value="east">ภาคตะวันออก</option>
+                        <option value="central">ภาคกลาง</option>
+                        <option value="west">ภาคตะวันตก</option>
+                        <option value="south">ภาคใต้</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">จังหวัด (Province)</label>
+                    <select class="filter-input" id="hh-province" onchange="updateAmphurOptions('hh')">
+                        <option value="">เลือกจังหวัด</option>
+                        <option>กระบี่</option>
+                        <option>กรุงเทพมหานคร</option>
+                        <option>กาญจนบุรี</option>
+                        <option>กาฬสินธุ์</option>
+                        <option>กำแพงเพชร</option>
+                        <option>ขอนแก่น</option>
+                        <option>จันทบุรี</option>
+                        <option>ฉะเชิงเทรา</option>
+                        <option>ชลบุรี</option>
+                        <option>ชัยนาท</option>
+                        <option>ชัยภูมิ</option>
+                        <option>ชุมพร</option>
+                        <option>เชียงราย</option>
+                        <option>เชียงใหม่</option>
+                        <option>ตรัง</option>
+                        <option>ตราด</option>
+                        <option>ตาก</option>
+                        <option>นครนายก</option>
+                        <option>นครปฐม</option>
+                        <option>นครพนม</option>
+                        <option>นครราชสีมา</option>
+                        <option>นครศรีธรรมราช</option>
+                        <option>นครสวรรค์</option>
+                        <option>นนทบุรี</option>
+                        <option>นราธิวาส</option>
+                        <option>น่าน</option>
+                        <option>บึงกาฬ</option>
+                        <option>บุรีรัมย์</option>
+                        <option>ปทุมธานี</option>
+                        <option>ประจวบคีรีขันธ์</option>
+                        <option>ปราจีนบุรี</option>
+                        <option>ปัตตานี</option>
+                        <option>พระนครศรีอยุธยา</option>
+                        <option>พะเยา</option>
+                        <option>พังงา</option>
+                        <option>พัทลุง</option>
+                        <option>พิจิตร</option>
+                        <option>พิษณุโลก</option>
+                        <option>เพชรบุรี</option>
+                        <option>เพชรบูรณ์</option>
+                        <option>แพร่</option>
+                        <option>ภูเก็ต</option>
+                        <option>มหาสารคาม</option>
+                        <option>มุกดาหาร</option>
+                        <option>แม่ฮ่องสอน</option>
+                        <option>ยโสธร</option>
+                        <option>ยะลา</option>
+                        <option>ร้อยเอ็ด</option>
+                        <option>ระนอง</option>
+                        <option>ระยอง</option>
+                        <option>ราชบุรี</option>
+                        <option>ลพบุรี</option>
+                        <option>ลำปาง</option>
+                        <option>ลำพูน</option>
+                        <option>เลย</option>
+                        <option>ศรีสะเกษ</option>
+                        <option>สกลนคร</option>
+                        <option>สงขลา</option>
+                        <option>สตูล</option>
+                        <option>สมุทรปราการ</option>
+                        <option>สมุทรสงคราม</option>
+                        <option>สมุทรสาคร</option>
+                        <option>สระแก้ว</option>
+                        <option>สระบุรี</option>
+                        <option>สิงห์บุรี</option>
+                        <option>สุโขทัย</option>
+                        <option>สุพรรณบุรี</option>
+                        <option>สุราษฎร์ธานี</option>
+                        <option>สุรินทร์</option>
+                        <option>หนองคาย</option>
+                        <option>หนองบัวลำภู</option>
+                        <option>อ่างทอง</option>
+                        <option>อำนาจเจริญ</option>
+                        <option>อุดรธานี</option>
+                        <option>อุตรดิตถ์</option>
+                        <option>อุทัยธานี</option>
+                        <option>อุบลราชธานี</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">อำเภอ (Amphur/District)</label>
+                    <select class="filter-input" id="hh-amphur">
+                        <option value="">เลือกอำเภอ</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Product Type (ประเภทสินค้า)</label>
+                    <select class="filter-input" id="hh-product">
+                        <option value="">Select Product</option>
+                        <option value="food">Food & Beverage</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="chemicals">Chemicals</option>
+                        <option value="textiles">Textiles</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Plant</label>
+                    <select class="filter-input" id="hh-plant">
+                        <option value="">Select Plant</option>
+                        <option value="plant-a">Plant A - Bangkok</option>
+                        <option value="plant-b">Plant B - Rayong</option>
+                        <option value="plant-c">Plant C - Chonburi</option>
+                        <option value="plant-d">Plant D - Samut Prakan</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="reset-btn" type="button" onclick="resetFilters('hh')">Reset Head-Haul Filters</button>
+            <script>
+            function resetFilters(type) {
+                // List of filter IDs for Head-Haul section
+                const ids = [
+                    `${type}-date`,
+                    `${type}-truck-type`,
+                    `${type}-zone`,
+                    `${type}-province`,
+                    `${type}-amphur`,
+                    `${type}-product`,
+                    `${type}-plant`
+                ];
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (el.type === "date") {
+                        // Reset date to today
+                        el.value = new Date().toISOString().split('T')[0];
+                    } else if (el.tagName === "SELECT") {
+                        el.selectedIndex = 0;
+                        // Also clear amphur options except the first
+                        if (id.endsWith('-amphur')) {
+                            el.innerHTML = '<option value="">เลือกอำเภอ</option>';
+                        }
+                    } else {
+                        el.value = "";
+                    }
+                });
+            }
+            </script>
+        </div>
+
+        <!-- Back-Haul Section -->
+        <div class="filter-section back-haul">
+            <div class="section-header">
+                <div class="section-icon">BH</div>
+                <h2 class="section-title">Back-Haul Filters</h2>
+            </div>
+            
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <div class="calendar-input">
+                        <input type="date" class="filter-input" id="bh-date">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Truck Type</label>
+                    <select class="filter-input" id="bh-truck-type">
+                        <option value="">Select Truck Type</option>
+                        <option value="container">Container Truck</option>
+                        <option value="flatbed">Flatbed Truck</option>
+                        <option value="tanker">Tanker Truck</option>
+                        <option value="refrigerated">Refrigerated Truck</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Back-Haul Zone (Region)</label>
+                    <select class="filter-input" id="bh-zone">
+                        <option value="Select Zone">เลือกโซนภาค</option>
+                        <option value="ภาคตะวันออกเฉียงเหนือ">ภาคตะวันออกเฉียงเหนือ</option>
+                        <option value="ภาคตะวันออก">ภาคตะวันออก</option>
+                        <option value="ภาคตะวันตก">ภาคตะวันตก</option>
+                        <option value="ภาคใต้">ภาคใต้</option>
+                        <option value="ภาคเหนือ">ภาคเหนือ</option>
+                        <option value="ภาคกลาง">ภาคกลาง</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Province</label>
+                    <select class="filter-input" id="bh-province" onchange="updateAmphurOptions('bh')">
+                        <option value="">เลือกจังหวัด</option>
+                        <option>กระบี่</option>
+                        <option>กรุงเทพมหานคร</option>
+                        <option>กาญจนบุรี</option>
+                        <option>กาฬสินธุ์</option>
+                        <option>กำแพงเพชร</option>
+                        <option>ขอนแก่น</option>
+                        <option>จันทบุรี</option>
+                        <option>ฉะเชิงเทรา</option>
+                        <option>ชลบุรี</option>
+                        <option>ชัยนาท</option>
+                        <option>ชัยภูมิ</option>
+                        <option>ชุมพร</option>
+                        <option>เชียงราย</option>
+                        <option>เชียงใหม่</option>
+                        <option>ตรัง</option>
+                        <option>ตราด</option>
+                        <option>ตาก</option>
+                        <option>นครนายก</option>
+                        <option>นครปฐม</option>
+                        <option>นครพนม</option>
+                        <option>นครราชสีมา</option>
+                        <option>นครศรีธรรมราช</option>
+                        <option>นครสวรรค์</option>
+                        <option>นนทบุรี</option>
+                        <option>นราธิวาส</option>
+                        <option>น่าน</option>
+                        <option>บึงกาฬ</option>
+                        <option>บุรีรัมย์</option>
+                        <option>ปทุมธานี</option>
+                        <option>ประจวบคีรีขันธ์</option>
+                        <option>ปราจีนบุรี</option>
+                        <option>ปัตตานี</option>
+                        <option>พระนครศรีอยุธยา</option>
+                        <option>พะเยา</option>
+                        <option>พังงา</option>
+                        <option>พัทลุง</option>
+                        <option>พิจิตร</option>
+                        <option>พิษณุโลก</option>
+                        <option>เพชรบุรี</option>
+                        <option>เพชรบูรณ์</option>
+                        <option>แพร่</option>
+                        <option>ภูเก็ต</option>
+                        <option>มหาสารคาม</option>
+                        <option>มุกดาหาร</option>
+                        <option>แม่ฮ่องสอน</option>
+                        <option>ยโสธร</option>
+                        <option>ยะลา</option>
+                        <option>ร้อยเอ็ด</option>
+                        <option>ระนอง</option>
+                        <option>ระยอง</option>
+                        <option>ราชบุรี</option>
+                        <option>ลพบุรี</option>
+                        <option>ลำปาง</option>
+                        <option>ลำพูน</option>
+                        <option>เลย</option>
+                        <option>ศรีสะเกษ</option>
+                        <option>สกลนคร</option>
+                        <option>สงขลา</option>
+                        <option>สตูล</option>
+                        <option>สมุทรปราการ</option>
+                        <option>สมุทรสงคราม</option>
+                        <option>สมุทรสาคร</option>
+                        <option>สระแก้ว</option>
+                        <option>สระบุรี</option>
+                        <option>สิงห์บุรี</option>
+                        <option>สุโขทัย</option>
+                        <option>สุพรรณบุรี</option>
+                        <option>สุราษฎร์ธานี</option>
+                        <option>สุรินทร์</option>
+                        <option>หนองคาย</option>
+                        <option>หนองบัวลำภู</option>
+                        <option>อ่างทอง</option>
+                        <option>อำนาจเจริญ</option>
+                        <option>อุดรธานี</option>
+                        <option>อุตรดิตถ์</option>
+                        <option>อุทัยธานี</option>
+                        <option>อุบลราชธานี</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">อำเภอ (Amphur/District)</label>
+                    <select class="filter-input" id="bh-amphur">
+                        <option value="">เลือกอำเภอ</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Product Type</label>
+                    <select class="filter-input" id="bh-product">
+                        <option value="">Select Product</option>
+                        <option value="food">Food & Beverage</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="chemicals">Chemicals</option>
+                        <option value="textiles">Textiles</option>
+                        <option value="Cement">Cement</option>  
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Plant</label>
+                    <select class="filter-input" id="bh-plant">
+                        <option value="">Select Plant</option>
+                        <option value="plant-a">Plant A - Bangkok</option>
+                        <option value="plant-b">Plant B - Rayong</option>
+                        <option value="plant-c">Plant C - Chonburi</option>
+                        <option value="plant-d">Plant D - Samut Prakan</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="reset-btn" type="button" onclick="resetFilters('bh')">Reset Back-Haul Filters</button>
+        </div>
+
+        <!-- Networking Map Section -->
+        <div style="margin: 2.5rem auto 2.5rem auto; max-width: 1100px; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1.5px solid #e0e0e0; padding: 1.5rem 1.5rem 1.2rem 1.5rem; display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 0.7rem; font-size: 1.18rem; font-weight: 600; color: #009966; margin-bottom: 1.1rem;">
+                <span style="font-size: 1.35rem;">🗺️</span> Thailand Networking Map
+            </div>
+            <div style="width: 100%; display: flex; justify-content: center;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875747.964370964!2d97.34380799999999!3d15.870032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29edb7b1e1b2b%3A0x40100b25de28a60!2sThailand!5e0!3m2!1sen!2sth!4v1682500000000!5m2!1sen!2sth" width="100%" height="340" style="border:0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-height: 240px; min-width: 320px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <!-- End Networking Map Section -->
+
+        <!-- HH : BH Matching Volume Section - Modern Card Style, Mockup Data, Thailand Data Included -->
+        <div class="content-preview" style="padding: 2.5rem 2rem 2rem 2rem; margin-bottom: 2rem; border-radius: 18px; box-shadow: 0 6px 32px rgba(193, 246, 218, 0.13); background: linear-gradient(120deg, #f7fafd 60%, #e3f2fd 100%); border: 1.5px solid #d1e3f6; max-width: 1100px; margin-left: auto; margin-right: auto;">
+            <div class="preview-title" style="margin-bottom: 2.2rem; font-size: 1.35rem; color: #1976d2; letter-spacing: 0.5px;">
+            <div class="preview-icon" style="background: #1976d2; margin-right: 0.8rem;"></div>
+            HH : BH Matching Volume (Mockup Data - Thailand)
+            </div>
+            <div style="display: flex; gap: 2.5rem; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;">
+            <!-- BH Chart Card -->
+            <div class="chart-container" style="flex: 1 1 0; min-width: 400px; max-width: 500px; background: #fafdff; border-radius: 16px; box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07); border: 1.5px solid #d1e3f6; padding: 1.5rem; margin-bottom: 0;">
+                <div class="chart-header" style="border-bottom: none; margin-bottom: 0.7rem;">
+                <h3 class="chart-title" style="font-size: 1.08rem; color: #1976d2;">BH Volume (Thailand, May 2025)</h3>
+                </div>
+                <div class="chart-wrapper" style="height: 325px; position: relative;">
+                <canvas id="bhChart" width="420" height="325" style="display: block;"></canvas>
+                <div id="bhTooltip" class="chart-tooltip" style="display:none; position:absolute; pointer-events:none; background:rgba(25, 118, 210, 0.97); color:#fff; padding:7px 14px; border-radius:7px; font-size:1rem; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.18);"></div>
+                </div>
+            </div>
+            <!-- HH Chart Card -->
+            <div class="chart-container" style="flex: 1 1 0; min-width: 400px; max-width: 600px; background: #fafdff; border-radius: 16px; box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07); border: 1.5px solid #d1e3f6; padding: 1.5rem; margin-bottom: 0;">
+                <div class="chart-header" style="border-bottom: none; margin-bottom: 0.7rem;">
+                <h3 class="chart-title" style="font-size: 1.08rem; color: #263238;">
+                    HH Volume (Thailand, May 2025)
+                    <span class="matching-label" style="background:#e3f2fd; color:#263238; border:1px solid #90caf9; white-space:nowrap;">
+                    สำหรับ Matching ไม่<span style="margin-left:2px;">ได้</span>
+                    </span>
+                </h3>
+                </div>
+                <div class="chart-wrapper" style="height: 300px; position: relative;">
+                <canvas id="hhChart" width="420" height="300" style="display: block;"></canvas>
+                <div id="hhTooltip" class="chart-tooltip" style="display:none; position:absolute; pointer-events:none; background:rgba(25, 118, 210, 0.97); color:#fff; padding:7px 14px; border-radius:7px; font-size:1rem; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.18);"></div>
+                </div>
+            </div>
+            </div>
+            <!-- Unified Legend -->
+            <div class="legend" style="margin-top: 1.5rem; justify-content: center;">
+            <div class="legend-item">
+                <div class="legend-color bh-color" style="background:#1976d2;"></div>
+                <span>BH/HH</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color matching-color" style="background:#263238;"></div>
+                <span>Matching</span>
+            </div>
+            </div>
+            <!-- Mockup Data Table for Thailand (below charts) -->
+            <div style="margin-top: 2.5rem;">
+                <div style="font-size: 1.08rem; font-weight: 600; color: #1976d2; margin-bottom: 1rem;">Thailand Mockup Data (Top 8 Provinces, May 2025)</div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; background: #fafbfc; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-size: 0.98rem;">
+                        <thead>
+                            <tr style="background: #f4f6fb; color: #2c3e50;">
+                                <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">Province</th>
+                                <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">BH Volume</th>
+                                <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">HH Volume</th>
+                                <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">Matching</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #fff;"><td style="padding: 0.6rem 0.5rem;">Bangkok</td><td style="padding: 0.6rem 0.5rem;">120</td><td style="padding: 0.6rem 0.5rem;">110</td><td style="padding: 0.6rem 0.5rem;">90</td></tr>
+                            <tr style="background: #f8f9fa;"><td style="padding: 0.6rem 0.5rem;">Chonburi</td><td style="padding: 0.6rem 0.5rem;">95</td><td style="padding: 0.6rem 0.5rem;">100</td><td style="padding: 0.6rem 0.5rem;">80</td></tr>
+                            <tr style="background: #fff;"><td style="padding: 0.6rem 0.5rem;">Rayong</td><td style="padding: 0.6rem 0.5rem;">80</td><td style="padding: 0.6rem 0.5rem;">85</td><td style="padding: 0.6rem 0.5rem;">70</td></tr>
+                            <tr style="background: #f8f9fa;"><td style="padding: 0.6rem 0.5rem;">Samut Prakan</td><td style="padding: 0.6rem 0.5rem;">70</td><td style="padding: 0.6rem 0.5rem;">75</td><td style="padding: 0.6rem 0.5rem;">60</td></tr>
+                            <tr style="background: #fff;"><td style="padding: 0.6rem 0.5rem;">Chiang Mai</td><td style="padding: 0.6rem 0.5rem;">65</td><td style="padding: 0.6rem 0.5rem;">60</td><td style="padding: 0.6rem 0.5rem;">50</td></tr>
+                            <tr style="background: #f8f9fa;"><td style="padding: 0.6rem 0.5rem;">Khon Kaen</td><td style="padding: 0.6rem 0.5rem;">55</td><td style="padding: 0.6rem 0.5rem;">50</td><td style="padding: 0.6rem 0.5rem;">40</td></tr>
+                            <tr style="background: #fff;"><td style="padding: 0.6rem 0.5rem;">Phuket</td><td style="padding: 0.6rem 0.5rem;">45</td><td style="padding: 0.6rem 0.5rem;">40</td><td style="padding: 0.6rem 0.5rem;">30</td></tr>
+                            <tr style="background: #f8f9fa;"><td style="padding: 0.6rem 0.5rem;">Nakhon Ratchasima</td><td style="padding: 0.6rem 0.5rem;">40</td><td style="padding: 0.6rem 0.5rem;">35</td><td style="padding: 0.6rem 0.5rem;">25</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- LPC Matching and Unmatched Reasons Dashboards (below HH : BH Matching Volume) -->
+        <div class="content-preview" style="margin-top: 2.5rem; margin-bottom: 2rem; padding: 2rem 2rem 2.5rem 2rem; border-radius: 18px; box-shadow: 0 6px 32px rgba(0,0,0,0.10); background: #fff; border: 1.5px solid #e0e0e0; max-width: 1100px; margin-left: auto; margin-right: auto;">
+            <div style="display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start; justify-content: space-between;">
+                <!-- LPC Matching (Plan/Actual) Bar Chart -->
+                <div style="flex:1 1 0; min-width:340px; max-width:520px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1.5px solid #e0e0e0; padding: 1.5rem;">
+                    <div style="font-size: 1.08rem; font-weight: 600; color: #222; margin-bottom: 0.7rem;">ปริมาณงาน LPC จัดงาน Matching (Plan/Actual) <span style='color:#b71c1c; font-size:1.1rem; font-weight:700;'>72/31 = <span style='color:#d32f2f;'>%Matching 43%</span></span></div>
+                    <div style="height: 320px; position: relative;">
+                        <canvas id="lpcMatchingChart" width="420" height="320"></canvas>
+                        <div id="lpcMatchingTooltip" class="chart-tooltip" style="display:none; position:absolute; pointer-events:none; background:rgba(30,30,30,0.97); color:#fff; padding:7px 14px; border-radius:7px; font-size:1rem; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.18);"></div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; margin-top: 1.2rem; justify-content: center; font-size: 0.98rem;">
+                        <span style="display: flex; align-items: center;"><span style="display:inline-block; width:18px; height:14px; background:#4285f4; margin-right:6px; border-radius:2px;"></span>Plan</span>
+                        <span style="display: flex; align-items: center;"><span style="display:inline-block; width:18px; height:14px; background:#ff9800; margin-right:6px; border-radius:2px;"></span>Actual</span>
+                    </div>
+                </div>
+                <!-- Unmatched Reasons Bar Chart -->
+                <div style="flex:1 1 0; min-width:340px; max-width:520px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1.5px solid #e0e0e0; padding: 1.5rem;">
+                    <div style="font-size: 1.08rem; font-weight: 600; color: #222; margin-bottom: 0.7rem;">รวมสาเหตุไม่สามารถ matching งานน้ำตาล MPV <span style='color:#b71c1c; font-size:1.1rem; font-weight:700;'>41 เที่ยว</span></div>
+                    <div style="height: 320px; position: relative;">
+                        <canvas id="unmatchedReasonChart" width="420" height="320"></canvas>
+                        <div id="unmatchedReasonTooltip" class="chart-tooltip" style="display:none; position:absolute; pointer-events:none; background:rgba(30,30,30,0.97); color:#fff; padding:7px 14px; border-radius:7px; font-size:1rem; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.18);"></div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; margin-top: 1.2rem; justify-content: center; font-size: 0.98rem;">
+                        <span style="display: flex; align-items: center;"><span style="display:inline-block; width:18px; height:14px; background:#bdbdbd; margin-right:6px; border-radius:2px;"></span>รถเสีย</span>
+                        <span style="display: flex; align-items: center;"><span style="display:inline-block; width:18px; height:14px; background:#ff9800; margin-right:6px; border-radius:2px;"></span>ประเภทผิด</span>
+                        <span style="display: flex; align-items: center;"><span style="display:inline-block; width:18px; height:14px; background:#e53935; margin-right:6px; border-radius:2px;"></span>ห้ามสินค้าขึ้นในโซน SCGJ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        // --- LPC Matching (Plan/Actual) Bar Chart Data ---
+        const lpcMatchingData = {
+            labels: ['บ.ขนส่งขอนแก่น', 'คุณภาวินี', 'บ.ขนส่งศิริสวัสดิ์', 'บ.ขนส่งอุดร', 'LD Logistics', 'บ.คาล.สุพรรณบุรี'],
+            plan:   [29, 20, 12, 7, 4, 3],
+            actual: [4, 13, 7, 4, 1, 3]
+        };
+        // --- Unmatched Reasons Bar Chart Data ---
+        const unmatchedReasonData = {
+            labels: ['บ.ขนส่งขอนแก่น', 'คุณภาวินี', 'บ.ขนส่งศิริสวัสดิ์', 'บ.ขนส่งอุดร', 'LD Logistics', 'บ.คาล.สุพรรณบุรี'],
+            reason1: [25, 0, 0, 0, 0, 0], // รถเสีย
+            reason2: [0, 5, 5, 0, 0, 0], // ประเภทผิด
+            reason3: [0, 0, 0, 3, 3, 3]  // ห้ามสินค้าขึ้นในโซน SCGJ
+        };
+        // --- Draw LPC Matching Bar Chart (Modern Grouped Style, with tooltips and diagonal y labels) ---
+        function drawLPCMatchingChart() {
+            const canvas = document.getElementById('lpcMatchingChart');
+            const ctx = canvas.getContext('2d');
+            // Improve sharpness for HiDPI screens
+            const dpr = window.devicePixelRatio || 1;
+            if (dpr !== 1) {
+                const oldWidth = canvas.width;
+                const oldHeight = canvas.height;
+                canvas.width = oldWidth * dpr;
+                canvas.height = oldHeight * dpr;
+                canvas.style.width = oldWidth + 'px';
+                canvas.style.height = oldHeight + 'px';
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 48;
+            const chartWidth = (canvas.width / (window.devicePixelRatio || 1)) - 2 * padding;
+            const chartHeight = (canvas.height / (window.devicePixelRatio || 1)) - 2 * padding - 18; // leave space for x labels
+            const groupCount = lpcMatchingData.labels.length;
+            const groupWidth = chartWidth / groupCount;
+            const barWidth = groupWidth / 2.2;
+            const maxValue = Math.max(...lpcMatchingData.plan, ...lpcMatchingData.actual) + 5;
+            // Y axis grid and labels
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.font = '13px Segoe UI, Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#888';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + chartWidth, y);
+                ctx.stroke();
+                const value = Math.round(maxValue - (maxValue / 5) * i);
+                // Move y-axis label closer to y-axis (reduce left margin)
+                ctx.fillText(value.toString(), padding - 6, y + 4);
+            }
+            // Bars and diagonal y labels
+            lpcMatchingData.labels.forEach((label, i) => {
+                const groupX = padding + i * groupWidth;
+                // Move bars to be side-by-side and centered
+                const barGap = 2; // minimal gap between bars
+                // Plan (blue)
+                const planHeight = (lpcMatchingData.plan[i] / maxValue) * chartHeight;
+                ctx.fillStyle = '#1976d2';
+                roundRect(ctx, groupX + groupWidth/2 - barWidth - barGap/2, padding + chartHeight - planHeight, barWidth, planHeight, 7, true, false);
+                // Actual (orange)
+                const actualHeight = (lpcMatchingData.actual[i] / maxValue) * chartHeight;
+                ctx.fillStyle = '#ff9800';
+                roundRect(ctx, groupX + groupWidth/2 + barGap/2, padding + chartHeight - actualHeight, barWidth, actualHeight, 7, true, false);
+                // Value labels
+                ctx.fillStyle = '#222';
+                ctx.font = 'bold 13px Segoe UI, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(lpcMatchingData.plan[i], groupX + groupWidth/2 - barWidth/2 - barGap/2, padding + chartHeight - planHeight - 8);
+                ctx.fillText(lpcMatchingData.actual[i], groupX + groupWidth/2 + barWidth/2 + barGap/2, padding + chartHeight - actualHeight - 8);
+                // Vertical x-axis labels (carrier names)
+                ctx.save();
+                ctx.translate(groupX + groupWidth/2, padding + chartHeight + 10);
+                ctx.rotate(-Math.PI/2);
+                ctx.font = '600 10px "Sarabun", "Segoe UI", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#263238';
+                ctx.fillText(label, 0, 0);
+                ctx.restore();
+            });
+            // Y axis
+            ctx.strokeStyle = '#bbb';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + chartHeight);
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.stroke();
+        }
+        // --- Add tooltip for LPC Matching chart ---
+        function addLPCMatchingTooltip() {
+            const canvas = document.getElementById('lpcMatchingChart');
+            const tooltip = document.getElementById('lpcMatchingTooltip');
+            const padding = 48;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding - 18;
+            const groupCount = lpcMatchingData.labels.length;
+            const groupWidth = chartWidth / groupCount;
+            const barWidth = groupWidth / 2.2;
+            const maxValue = Math.max(...lpcMatchingData.plan, ...lpcMatchingData.actual) + 5;
+            let bars = [];
+            lpcMatchingData.labels.forEach((label, i) => {
+                const groupX = padding + i * groupWidth;
+                // Plan
+                const planHeight = (lpcMatchingData.plan[i] / maxValue) * chartHeight;
+                bars.push({
+                    x: groupX + groupWidth/2 - barWidth/2,
+                    y: padding + chartHeight - planHeight,
+                    w: barWidth,
+                    h: planHeight,
+                    value: lpcMatchingData.plan[i],
+                    label: label,
+                    type: 'Plan',
+                    color: '#1976d2'
+                });
+                // Actual
+                const actualHeight = (lpcMatchingData.actual[i] / maxValue) * chartHeight;
+                bars.push({
+                    x: groupX + groupWidth/2 + barWidth/2,
+                    y: padding + chartHeight - actualHeight,
+                    w: barWidth,
+                    h: actualHeight,
+                    value: lpcMatchingData.actual[i],
+                    label: label,
+                    type: 'Actual',
+                    color: '#ff9800'
+                });
+            });
+            canvas.onmousemove = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+                let found = null;
+                for (let bar of bars) {
+                    if (mx >= bar.x && mx <= bar.x + bar.w && my >= bar.y && my <= bar.y + bar.h) {
+                        found = bar;
+                        break;
+                    }
+                }
+                if (found) {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (found.x + found.w/2 - 30) + 'px';
+                    tooltip.style.top = (found.y - 38) + 'px';
+                    tooltip.innerHTML = `<span style='color:${found.color};font-weight:bold;'>${found.type}</span> : <b>${found.value}</b><br><span style='color:#b2dfdb;'>${found.label}</span>`;
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            };
+            canvas.onmouseleave = function() {
+                tooltip.style.display = 'none';
+            };
+        }
+        // --- Draw Unmatched Reasons Bar Chart (Modern Stacked Style) ---
+        function drawUnmatchedReasonChart() {
+            const canvas = document.getElementById('unmatchedReasonChart');
+            const ctx = canvas.getContext('2d');
+            // Improve sharpness for HiDPI screens
+            const dpr = window.devicePixelRatio || 1;
+            if (dpr !== 1) {
+                const oldWidth = canvas.width;
+                const oldHeight = canvas.height;
+                canvas.width = oldWidth * dpr;
+                canvas.height = oldHeight * dpr;
+                canvas.style.width = oldWidth + 'px';
+                canvas.style.height = oldHeight + 'px';
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 48;
+            const chartWidth = (canvas.width / (window.devicePixelRatio || 1)) - 2 * padding;
+            const chartHeight = (canvas.height / (window.devicePixelRatio || 1)) - 2 * padding - 26;
+            const groupCount = unmatchedReasonData.labels.length;
+            const barWidth = chartWidth / (groupCount * 1.3);
+            const maxValue = Math.max(...unmatchedReasonData.reason1.map((v,i)=>v+unmatchedReasonData.reason2[i]+unmatchedReasonData.reason3[i])) + 5;
+            // Y axis grid and labels
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.font = '13px Segoe UI, Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#888';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + chartWidth, y);
+                ctx.stroke();
+                const value = Math.round(maxValue - (maxValue / 5) * i);
+                ctx.fillText(value.toString(), padding - 18, y + 4);
+            }
+            // Bars (stacked)
+            unmatchedReasonData.labels.forEach((label, i) => {
+                const x = padding + i * (barWidth * 1.3);
+                let yBase = padding + chartHeight;
+                // Reason 1: รถเสีย (gray)
+                const h1 = (unmatchedReasonData.reason1[i] / maxValue) * chartHeight;
+                ctx.fillStyle = '#bdbdbd';
+                roundRect(ctx, x, yBase - h1, barWidth, h1, 7, true, false);
+                if (unmatchedReasonData.reason1[i] > 0) {
+                    ctx.fillStyle = '#222';
+                    ctx.font = 'bold 13px Segoe UI, Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(unmatchedReasonData.reason1[i], x + barWidth/2, yBase - h1/2);
+                }
+                yBase -= h1;
+                // Reason 2: ประเภทผิด (orange)
+                const h2 = (unmatchedReasonData.reason2[i] / maxValue) * chartHeight;
+                ctx.fillStyle = '#ff9800';
+                roundRect(ctx, x, yBase - h2, barWidth, h2, 7, true, false);
+                if (unmatchedReasonData.reason2[i] > 0) {
+                    ctx.fillStyle = '#222';
+                    ctx.font = 'bold 13px Segoe UI, Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(unmatchedReasonData.reason2[i], x + barWidth/2, yBase - h2/2);
+                }
+                yBase -= h2;
+                // Reason 3: ห้ามสินค้าขึ้นในโซน SCGJ (red)
+                const h3 = (unmatchedReasonData.reason3[i] / maxValue) * chartHeight;
+                ctx.fillStyle = '#e53935';
+                roundRect(ctx, x, yBase - h3, barWidth, h3, 7, true, false);
+                if (unmatchedReasonData.reason3[i] > 0) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 13px Segoe UI, Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(unmatchedReasonData.reason3[i], x + barWidth/2, yBase - h3/2);
+                }
+                // X axis labels (carrier names, vertical alignment like LPC Matching chart)
+                ctx.save();
+                ctx.translate(x + barWidth/2, padding + chartHeight + 10); // match LPC Matching label position
+                ctx.rotate(-Math.PI/2); // vertical
+                ctx.font = '600 9px "Sarabun", "Segoe UI", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#263238';
+                ctx.fillText(label, 0, 0);
+                ctx.restore();
+            });
+            // Y axis
+            ctx.strokeStyle = '#bbb';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + chartHeight);
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.stroke();
+        }
+        // --- Helper: Draw rounded rectangle ---
+        function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
+        }
+        // --- Helper: Draw legend ---
+        function drawLegend(ctx, items, x, y, boxSize) {
+            let offset = 0;
+            items.forEach(item => {
+                ctx.save();
+                ctx.beginPath();
+                ctx.fillStyle = item.color;
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1.2;
+                ctx.rect(x + offset, y, boxSize, boxSize-2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+                ctx.fillStyle = '#444';
+                ctx.font = '13px Segoe UI, Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(item.label, x + offset + boxSize + 7, y + boxSize - 5);
+                offset += boxSize + 70;
+            });
+        }
+        // --- Init new charts ---
+        function initLPCDashboards() {
+            drawLPCMatchingChart();
+            drawUnmatchedReasonChart();
+            addLPCMatchingTooltip();
+        }
+        window.addEventListener('DOMContentLoaded', initLPCDashboards);
+        window.addEventListener('resize', () => { setTimeout(initLPCDashboards, 100); });
+        // --- Sample data for charts (based on the first image) ---
+        const bhData = {
+            days: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+            bh: [30, 25, 30, 25, 20, 15, 18, 20, 15, 10, 12, 15, 18, 20, 15, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            matching: [20, 15, 20, 15, 10, 12, 15, 18, 12, 8, 10, 12, 15, 18, 12, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        };
+        const hhData = {
+            days: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+            hh: [25, 20, 25, 30, 12, 15, 25, 23, 20, 22, 15, 20, 18, 15, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            matching: [18, 15, 18, 20, 10, 12, 16, 18, 15, 18, 12, 15, 14, 12, 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        };
+
+        function drawChart(canvasId, data, primaryLabel) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 48;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            const barWidth = chartWidth / (data.days.length * 1.2);
+            const maxValue = Math.max(...data[primaryLabel.toLowerCase()], ...data.matching) + 5;
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + chartWidth, y);
+                ctx.stroke();
+                ctx.fillStyle = '#888';
+                ctx.font = '13px Segoe UI, Arial, sans-serif';
+                ctx.textAlign = 'right';
+                const value = Math.round(maxValue - (maxValue / 5) * i);
+                ctx.fillText(value.toString(), padding - 12, y + 4);
+            }
+            data.days.forEach((day, index) => {
+                const x = padding + index * (barWidth * 1.2);
+                if (data[primaryLabel.toLowerCase()][index] > 0) {
+                    const primaryHeight = (data[primaryLabel.toLowerCase()][index] / maxValue) * chartHeight;
+                    ctx.fillStyle = '#009966';
+                    ctx.fillRect(x, padding + chartHeight - primaryHeight, barWidth * 0.8, primaryHeight);
+                    const matchingHeight = (data.matching[index] / maxValue) * chartHeight;
+                    ctx.fillStyle = '#222';
+                    ctx.fillRect(x + barWidth * 0.2, padding + chartHeight - matchingHeight, barWidth * 0.6, matchingHeight);
+                }
+                if (day % 5 === 1 || day === 1) {
+                    ctx.fillStyle = '#444';
+                    ctx.font = '12px Segoe UI, Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(day.toString(), x + barWidth * 0.4, padding + chartHeight + 20);
+                }
+            });
+            ctx.strokeStyle = '#bbb';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + chartHeight);
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.stroke();
+        }
+
+        function addBarTooltip(canvasId, data, primaryLabel, tooltipId) {
+            const canvas = document.getElementById(canvasId);
+            const tooltip = document.getElementById(tooltipId);
+            const padding = 48;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            const barWidth = chartWidth / (data.days.length * 1.2);
+            const maxValue = Math.max(...data[primaryLabel.toLowerCase()], ...data.matching) + 5;
+            let bars = [];
+            data.days.forEach((day, index) => {
+                const x = padding + index * (barWidth * 1.2);
+                if (data[primaryLabel.toLowerCase()][index] > 0) {
+                    const primaryHeight = (data[primaryLabel.toLowerCase()][index] / maxValue) * chartHeight;
+                    bars.push({
+                        x: x,
+                        y: padding + chartHeight - primaryHeight,
+                        w: barWidth * 0.8,
+                        h: primaryHeight,
+                        value: data[primaryLabel.toLowerCase()][index],
+                        label: primaryLabel,
+                        day: day,
+                        color: '#009966'
+                    });
+                    const matchingHeight = (data.matching[index] / maxValue) * chartHeight;
+                    bars.push({
+                        x: x + barWidth * 0.2,
+                        y: padding + chartHeight - matchingHeight,
+                        w: barWidth * 0.6,
+                        h: matchingHeight,
+                        value: data.matching[index],
+                        label: 'Matching',
+                        day: day,
+                        color: '#222'
+                    });
+                }
+            });
+            canvas.onmousemove = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+                let found = null;
+                for (let bar of bars) {
+                    if (mx >= bar.x && mx <= bar.x + bar.w && my >= bar.y && my <= bar.y + bar.h) {
+                        found = bar;
+                        break;
+                    }
+                }
+                if (found) {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (found.x + found.w/2 - 30) + 'px';
+                    tooltip.style.top = (found.y - 38) + 'px';
+                    tooltip.innerHTML = `<span style='color:${found.color};font-weight:bold;'>${found.label}</span> : <b>${found.value}</b><br><span style='color:#b2dfdb;'>Day : ${found.day}</span>`;
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            };
+            canvas.onmouseleave = function() {
+                tooltip.style.display = 'none';
+            };
+        }
+
+        function initCharts() {
+            setTimeout(() => {
+                drawChart('bhChart', bhData, 'BH');
+                drawChart('hhChart', hhData, 'HH');
+                addBarTooltip('bhChart', bhData, 'BH', 'bhTooltip');
+                addBarTooltip('hhChart', hhData, 'HH', 'hhTooltip');
+            }, 500);
+        }
+        window.addEventListener('load', initCharts);
+        window.addEventListener('resize', () => { setTimeout(initCharts, 100); });
+    </script>
+
+        <!-- The rest of the page remains unchanged -->
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
+            <!-- Right: Filters and Table -->
+            <div style="flex: 1 1 0; min-width: 340px; display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e9ecef; padding: 1.5rem; margin-bottom: 0;">
+                <div style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 1rem;">เลือกกำลังรถ</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- ... (filters unchanged) ... -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Date</label>
+                    <input type="date" class="filter-input" id="custom-date">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Truck Type</label>
+                    <select class="filter-input" id="custom-truck-type">
+                    <option value="">Select Truck Type</option>
+                    <option>4 ล้อ</option>
+                    <option>6 ล้อ</option>
+                    <option>8 ล้อ</option>
+                    <option>10 ล้อ</option>
+                    <option>รถ Trailor ตู้ 20 ฟุต</option>
+                    <option>รถ Trailor ตู้ 40 ฟุต</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Back-Haul Zone</label>
+                    <select class="filter-input" id="custom-zone">
+                    <option value="">Select Zone</option>
+                    <option>ภาคกลาง</option>
+                    <option>ภาคตะวันตก</option>
+                    <option>ภาคตะวันออก</option>
+                    <option>ภาคตะวันออกเฉียงเหนือ</option>
+                    <option>ภาคเหนือ</option>
+                    <option>ภาคใต้</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Province</label>
+                    <select class="filter-input" id="custom-province" onchange="updateAmphurOptionsCustom()">
+                    <option value="">เลือกจังหวัด</option>
+                    <option>กระบี่</option>
+                    <option>กรุงเทพมหานคร</option>
+                    <option>กาญจนบุรี</option>
+                    <option>กาฬสินธุ์</option>
+                    <option>กำแพงเพชร</option>
+                    <option>ขอนแก่น</option>
+                    <option>จันทบุรี</option>
+                    <option>ฉะเชิงเทรา</option>
+                    <option>ชลบุรี</option>
+                    <option>ชัยนาท</option>
+                    <option>ชัยภูมิ</option>
+                    <option>ชุมพร</option>
+                    <option>เชียงราย</option>
+                    <option>เชียงใหม่</option>
+                    <option>ตรัง</option>
+                    <option>ตราด</option>
+                    <option>ตาก</option>
+                    <option>นครนายก</option>
+                    <option>นครปฐม</option>
+                    <option>นครพนม</option>
+                    <option>นครราชสีมา</option>
+                    <option>นครศรีธรรมราช</option>
+                    <option>นครสวรรค์</option>
+                    <option>นนทบุรี</option>
+                    <option>นราธิวาส</option>
+                    <option>น่าน</option>
+                    <option>บึงกาฬ</option>
+                    <option>บุรีรัมย์</option>
+                    <option>ปทุมธานี</option>
+                    <option>ประจวบคีรีขันธ์</option>
+                    <option>ปราจีนบุรี</option>
+                    <option>ปัตตานี</option>
+                    <option>พระนครศรีอยุธยา</option>
+                    <option>พะเยา</option>
+                    <option>พังงา</option>
+                    <option>พัทลุง</option>
+                    <option>พิจิตร</option>
+                    <option>พิษณุโลก</option>
+                    <option>เพชรบุรี</option>
+                    <option>เพชรบูรณ์</option>
+                    <option>แพร่</option>
+                    <option>ภูเก็ต</option>
+                    <option>มหาสารคาม</option>
+                    <option>มุกดาหาร</option>
+                    <option>แม่ฮ่องสอน</option>
+                    <option>ยโสธร</option>
+                    <option>ยะลา</option>
+                                       <option>ร้อยเอ็ด</option>
+                    <option>ระนอง</option>
+                    <option>ระยอง</option>
+                    <option>ราชบุรี</option>
+                    <option>ลพบุรี</option>
+                    <option>ลำปาง</option>
+                    <option>ลำพูน</option>
+                    <option>เลย</option>
+                    <option>ศรีสะเกษ</option>
+                    <option>สกลนคร</option>
+                    <option>สงขลา</option>
+                    <option>สตูล</option>
+                    <option>สมุทรปราการ</option>
+                    <option>สมุทรสงคราม</option>
+                    <option>สมุทรสาคร</option>
+                    <option>สระแก้ว</option>
+                    <option>สระบุรี</option>
+                    <option>สิงห์บุรี</option>
+                    <option>สุโขทัย</option>
+                    <option>สุพรรณบุรี</option>
+                    <option>สุราษฎร์ธานี</option>
+                    <option>สุรินทร์</option>
+                    <option>หนองคาย</option>
+                    <option>หนองบัวลำภู</option>
+                    <option>อ่างทอง</option>
+                    <option>อำนาจเจริญ</option>
+                    <option>อุดรธานี</option>
+                    <option>อุตรดิตถ์</option>
+                    <option>อุทัยธานี</option>
+                    <option>อุบลราชธานี</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">อำเภอ (Amphur/District)</label>
+                    <select class="filter-input" id="custom-amphur">
+                    <option value="">เลือกอำเภอ</option>
+                    </select>
+                </div>
+                <script>
+                function updateAmphurOptionsCustom() {
+                    const provinceSelect = document.getElementById('custom-province');
+                    const amphurSelect = document.getElementById('custom-amphur');
+                    const province = provinceSelect.value;
+                    amphurSelect.innerHTML = '<option value="">เลือกอำเภอ</option>';
+                    if (provinceToAmphur[province]) {
+                    provinceToAmphur[province].forEach(amphur => {
+                        const option = document.createElement('option');
+                        option.value = amphur;
+                        option.textContent = amphur;
+                        amphurSelect.appendChild(option);
+                    });
+                    }
+                }
+                </script>
+                  
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Product Type</label>
+                    <select class="filter-input" id="custom-product">
+                    <option value="">Select Product</option>
+                    <option>Food & Beverage</option>
+                    <option>Electronics</option>
+                    <option>Automotive</option>
+                    <option>Chemicals</option>
+                    <option>Textiles</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label class="filter-label">Plant</label>
+                    <select class="filter-input" id="custom-plant">
+                    <option value="">Select Plant</option>
+                    <option>Plant A - กรุงเทพมหานคร</option>
+                    <option>Plant B - ระยอง</option>
+                    <option>Plant C - ชลบุรี</option>
+                    <option>Plant D - สมุทรปราการ</option>
+                    </select>
+                </div>
+                </div>
+                <!-- Reset Filter Button -->
+                <button type="button" class="reset-btn" style="margin-top: 1.2rem;" onclick="resetCustomFilters()">Reset เลือกกำลังรถ</button>
+                <script>
+                function resetCustomFilters() {
+                // Reset date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('custom-date').value = today;
+                // Reset selects
+                document.getElementById('custom-truck-type').selectedIndex = 0;
+                document.getElementById('custom-zone').selectedIndex = 0;
+                document.getElementById('custom-province').selectedIndex = 0;
+                document.getElementById('custom-amphur').innerHTML = '<option value="">เลือกอำเภอ</option>';
+                document.getElementById('custom-product').selectedIndex = 0;
+                document.getElementById('custom-plant').selectedIndex = 0;
+                }
+                // Set default date on load
+                window.addEventListener('DOMContentLoaded', function() {
+                const today = new Date().toISOString().split('T')[0];
+                const dateInput = document.getElementById('custom-date');
+                if (dateInput) dateInput.value = today;
+                });
+                </script>
+                </div>
+                <div style="background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e9ecef; padding: 1.5rem; margin-bottom: 0;">
+                    <div style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 1rem;">เลือกกลุ่มกำลังรถ</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                            <input type="checkbox" class="job-filter" value="🟢 งาน SCGJWD" checked style="accent-color: #667eea; width: 18px; height: 18px; border-radius: 4px;"> 🟢 งาน SCGJWD
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                            <input type="checkbox" class="job-filter" value="⏳ อยู่ในระบบคิว" checked style="accent-color: #667eea; width: 18px; height: 18px; border-radius: 4px;"> ⏳ อยู่ในระบบคิว (พร้อมรับงาน)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                            <input type="checkbox" class="job-filter" value="🟡 ไม่ได้ลงคิวในโซนภาค" checked style="accent-color: #667eea; width: 18px; height: 18px; border-radius: 4px;"> 🟡 ไม่ได้ลงคิวในโซนภาค
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                            <input type="checkbox" class="job-filter" value="🔴 ไม่ได้ลงคิวนอกโซนภาค" checked style="accent-color: #667eea; width: 18px; height: 18px; border-radius: 4px;"> 🔴 ไม่ได้ลงคิวนอกโซนภาค
+                        </label>
+                    </div>
+                    <!-- Mock-up Data Table -->
+                    <div style="overflow-x: auto;">
+                        <table id="truck-table" style="width: 100%; border-collapse: separate; border-spacing: 0; background: #fafbfc; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-size: 0.98rem;">
+                            <thead>
+                                <tr style="background: #f4f6fb; color: #2c3e50;">
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ลำดับ</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ทะเบียนรถ</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ประเภทรถ</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">&nbsp&nbsp&nbsp&nbspโซนภาค</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">จังหวัด</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ประเภทสินค้า</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">โรงงานต้นทาง</th>
+                                    <th style="padding: 0.75rem 0.5rem; font-weight: 600; border-bottom: 2px solid #e9ecef;">ประเภทงาน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="truck-table-body">
+                                <!-- Table rows will be rendered by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <script>
+            const truckTableData = [
+                { no: 1, reg: "1กข 1234", type: "Container", zone: "เหนือ", province: "กรุงเทพมหานคร", product: "Food", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 2, reg: "2ขค 5678", type: "Flatbed", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
+                { no: 3, reg: "3งจ 9012", type: "Tanker", zone: "กลาง", province: "ชลบุรี", product: "Automotive", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 4, reg: "4จฉ 3456", type: "Refrigerated", zone: "ใต้", province: "ภูเก็ต", product: "Chemicals", plant: "Plant D", job: "🟡 ไม่ได้ลงคิวนอกโซนภาค" },
+                { no: 5, reg: "5ฉช 7890", type: "Container", zone: "อีสาน", province: "ขอนแก่น", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 6, reg: "6ชซ 2345", type: "Flatbed", zone: "อีสาน", province: "ขอนแก่น", product: "Food", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" },
+                { no: 7, reg: "7ซฌ 6789", type: "Tanker", zone: "ตะวันออก", province: "ระยอง", product: "Electronics", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 8, reg: "8ฌญ 1234", type: "Refrigerated", zone: "กลาง", province: "ชลบุรี", product: "Food", plant: "Plant C", job: "🟡 ไม่ได้ลงคิวในโซนภาค" },
+                { no: 9, reg: "8ฌฌ 9013", type: "Refrigerated Truck", zone: "เหนือ", province: "เชียงใหม่", product: "Food & Beverage", plant: "Plant D", job: "🔴 ไม่ได้ลงคิวนอกโซนภาค" },
+                { no: 10, reg: "9ญญ 3457", type: "Container Truck", zone: "ใต้", province: "ภูเก็ต", product: "Textiles", plant: "Plant A", job: "🟢 งาน SCGJWD" },
+                { no: 11, reg: "10ฎฎ 7891", type: "Flatbed Truck", zone: "ตะวันออก", province: "ชลบุรี", product: "Automotive", plant: "Plant B", job: "⏳ อยู่ในระบบคิว" }
+            ];
+
+            function renderTruckTable() {
+                const checkedJobs = Array.from(document.querySelectorAll('.job-filter:checked')).map(cb => cb.value.trim());
+                const tbody = document.getElementById('truck-table-body');
+                tbody.innerHTML = '';
+                let rowIndex = 1;
+                truckTableData.forEach(row => {
+                    // Match only if job type is checked
+                    if (checkedJobs.includes(row.job)) {
+                        const tr = document.createElement('tr');
+                        tr.style.background = rowIndex % 2 === 0 ? '#f8f9fa' : '#fff';
+                        tr.innerHTML = `
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${rowIndex}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp${row.reg}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ${row.type}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${row.zone}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp${row.province}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.product}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.plant}</td>
+                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp&nbsp ${row.job}</td>
+                        `;
+                        tbody.appendChild(tr);
+                        rowIndex++;
+                    }
+                });
+            }
+            document.querySelectorAll('.job-filter').forEach(cb => {
+                cb.addEventListener('change', renderTruckTable);
+            });
+            window.addEventListener('DOMContentLoaded', renderTruckTable);
+            </script>
+        </div>
+
+    <script>
+        // Set default dates to current date
+        const today = new Date().toISOString().split('T')[0];
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('hh-date').value = today;
+            document.getElementById('bh-date').value = today;
+        });
+    </script>
+    <script>
+// --- Province to Amphur Mapping (Thai) ---
+const provinceToAmphur = {
+    'กรุงเทพมหานคร': ['เขตพระนคร', 'เขตดุสิต', 'เขตหนองจอก', 'เขตบางรัก', 'เขตบางเขน', 'เขตบางกะปิ', 'เขตปทุมวัน', 'เขตป้อมปราบศัตรูพ่าย', 'เขตพระโขนง', 'เขตมีนบุรี', 'เขตลาดกระบัง', 'เขตยานนาวา', 'เขตสัมพันธวงศ์', 'เขตพญาไท', 'เขตธนบุรี', 'เขตบางกอกใหญ่', 'เขตห้วยขวาง', 'เขตคลองสาน', 'เขตตลิ่งชัน', 'เขตบางกอกน้อย', 'เขตบางขุนเทียน', 'เขตภาษีเจริญ', 'เขตหนองแขม', 'เขตราษฎร์บูรณะ', 'เขตบางพลัด', 'เขตดินแดง', 'เขตบึงกุ่ม', 'เขตสาทร', 'เขตบางซื่อ', 'เขตจตุจักร', 'เขตบางคอแหลม', 'เขตประเวศ', 'เขตคลองเตย', 'เขตสวนหลวง', 'เขตจอมทอง', 'เขตดอนเมือง', 'เขตราชเทวี', 'เขตลาดพร้าว', 'เขตวัฒนา', 'เขตบางแค', 'เขตหลักสี่', 'เขตสายไหม', 'เขตคันนายาว', 'เขตสะพานสูง', 'เขตวังทองหลาง', 'เขตคลองสามวา', 'เขตบางนา', 'เขตทวีวัฒนา', 'เขตทุ่งครุ', 'เขตบางบอน'],
+    'กระบี่': ['เมืองกระบี่', 'เขาพนม', 'เกาะลันตา', 'คลองท่อม', 'อ่าวลึก', 'ปลายพระยา', 'ลำทับ', 'เหนือคลอง'],
+    'กาญจนบุรี': ['เมืองกาญจนบุรี', 'ไทรโยค', 'บ่อพลอย', 'ศรีสวัสดิ์', 'ท่ามะกา', 'ท่าม่วง', 'ทองผาภูมิ', 'สังขละบุรี', 'ด่านมะขามเตี้ย', 'หนองปรือ', 'ห้วยกระเจา'],
+    'กาฬสินธุ์': ['เมืองกาฬสินธุ์', 'นามน', 'กมลาไสย', 'ร่องคำ', 'กุฉินารายณ์', 'เขาวง', 'ยางตลาด', 'ห้วยเม็ก', 'สหัสขันธ์', 'คำม่วง', 'ท่าคันโท', 'หนองกุงศรี', 'สมเด็จ', 'ห้วยผึ้ง', 'สามชัย', 'นาคู', 'ดอนจาน', 'ฆ้องชัย'],
+    'เชียงใหม่': ['เมืองเชียงใหม่', 'จอมทอง', 'แม่แจ่ม', 'เชียงดาว', 'ดอยสะเก็ด', 'แม่แตง', 'แม่ริม', 'สะเมิง', 'ฝาง', 'แม่อาย', 'พร้าว', 'สันป่าตอง', 'สันกำแพง', 'สันทราย', 'หางดง', 'ฮอด', 'ดอยเต่า', 'อมก๋อย', 'สารภี', 'เวียงแหง', 'ไชยปราการ', 'แม่วาง', 'แม่ออน', 'ดอยหล่อ', 'กัลยาณิวัฒนา'],
+    'ชลบุรี': ['เมืองชลบุรี', 'บ้านบึง', 'หนองใหญ่', 'บางละมุง', 'พานทอง', 'พนัสนิคม', 'ศรีราชา', 'เกาะจันทร์', 'สัตหีบ', 'บ่อทอง', 'เกาะสีชัง'],
+    'ขอนแก่น': ['เมืองขอนแก่น', 'บ้านฝาง', 'พระยืน', 'หนองเรือ', 'ชุมแพ', 'สีชมพู', 'น้ำพอง', 'อุบลรัตน์', 'กระนวน', 'บ้านไผ่', 'เปือยน้อย', 'พล', 'แวงใหญ่', 'แวงน้อย', 'หนองสองห้อง', 'ภูเวียง', 'มัญจาคีรี', 'ชนบท', 'เขาสวนกวาง', 'ภูผาม่าน', 'ซำสูง', 'โคกโพธิ์ไชย', 'หนองนาคำ', 'บ้านแฮด', 'โนนศิลา', 'เวียงเก่า'],
+    'จันทบุรี': ['เมืองจันทบุรี', 'ขลุง', 'เกาะขาม', 'หนองบัว', 'ท่าใหม่', 'สอยดาว', 'มะขาม', 'แหลมสิงห์', 'นายายอาม'],
+    'ฉะเชิงเทรา': ['เมืองฉะเชิงเทรา', 'บางคล้า', 'บางปะกง', 'แปลงยาว', 'ท่าตะเกียบ', 'คลองเขื่อน', 'หนองขาม', 'สนามชัยเขต'],
+    'ชลบุรี': ['เมืองชลบุรี', 'บ้านบึง', 'หนองใหญ่', 'บางละมุง', 'พานทอง', 'พนัสนิคม', 'ศรีราชา', 'เกาะจันทร์', 'สัตหีบ', 'บ่อทอง', 'เกาะสีชัง'],
+    'ชัยนาท': ['เมืองชัยนาท', 'มโนรมย์', 'บรรพตพิสัย', 'สรรคบุรี', 'วัดสิงห์', 'หันคา', 'หนองมะโมง', 'เจ้าพระยา'],
+    'ชัยภูมิ': ['เมืองชัยภูมิ', 'บ้านเขว้า', 'ด่านขุนทด', 'ภูเขียว', 'ซับสมอทอด', 'หนองบัวแดง', 'คอนสวรรค์', 'แก้งคร้อ'],
+    'ชุมพร': ['เมืองชุมพร', 'ท่าแซะ', 'ปะทิว', 'หลังสวน', 'พะโต๊ะ', 'สวี', 'บางสะพาน', 'ห้วยทราย'],
+    'เชียงราย': ['เมืองเชียงราย', 'แม่จัน', 'แม่สาย', 'เชียงของ', 'ดอยหล่อ', 'เวียงเชียงรุ้ง', 'ป่าแดด', 'แม่ฟ้าหลวง'],
+    'เชียงใหม่': ['เมืองเชียงใหม่', 'จอมทอง', 'แม่แจ่ม', 'เชียงดาว', 'ดอยสะเก็ด', 'แม่แตง', 'แม่ริม', 'สะเมิง', 'ฝาง', 'แม่อาย', 'พร้าว', 'สันป่าตอง', 'สันกำแพง', 'สันทราย', 'หางดง', 'ฮอด', 'ดอยเต่า', 'อมก๋อย', 'สารภี', 'เวียงแหง', 'ไชยปราการ', 'แม่วาง', 'แม่ออน', 'ดอยหล่อ', 'กัลยาณิวัฒนา'],
+    'ตรัง': ['เมืองตรัง', 'กันตัง', 'ย่านตาขาว', 'ปะเหลียน', 'รัษฎา', 'สิเกา', 'ห้วยยอด', 'นาโยง'],
+    'ตราด': ['เมืองตราด', 'คลองใหญ่', 'เกาะช้าง', 'เกาะกูด', 'เกาะหมาก', 'บ่อไร่', 'แหลมงอบ'],
+    'ตาก': ['เมืองตาก', 'แม่สอด', 'พบพระ', 'อุ้มผาง', 'สามเงา', 'ตากออก', 'แม่ระมาด', 'บ้านตาก'],
+    'นครนายก': ['เมืองนครนายก', 'บ้านนา', 'ปากพลี', 'องครักษ์', 'นครหลวง', 'เขาพระ', 'สาริกา'],
+    'นครปฐม': ['เมืองนครปฐม', 'สามพราน', 'นครชัยศรี', 'พุทธมณฑล', 'ดอนตูม', 'บ้านแพ้ว', 'กระทุ่มแบน'],
+    'นครพนม': ['เมืองนครพนม', 'ท่าอุเทน', 'โพนสวรรค์', 'บ้านแพง', 'ศรีสงคราม', 'นาหว้า', 'นาแก', 'เรณูนคร'],
+    'นครราชสีมา': ['เมืองนครราชสีมา', 'ครบุรี', 'เสิงสาง', 'คง', 'บัวใหญ่', 'โนนสูง', 'ปักธงชัย', 'หนองบุญมาก', 'บ้านเหลื่อม', 'เมืองยาง', 'สรรคบุรี', 'เทพารักษ์'],
+    'นครศรีธรรมราช': ['เมืองนครศรีธรรมราช', 'ท่าศาลา', 'ปากพนัง', 'พระพรหม', 'ลานสกา', 'ร่อนพิบูลย์', 'ชะอวด', 'สิชล', 'นบพิตำ', 'ขนอม', 'หัวไทร', 'เฉลิมพระเกียรติ'],
+    'นครสวรรค์': ['เมืองนครสวรรค์', 'พยุห์', 'ตากฟ้า', 'ตากออก', 'แม่เปิน', 'นครไทย', 'บรรพตพิสัย', 'หนองบัว'],
+    'นนทบุรี': ['เมืองนนทบุรี', 'ปากเกร็ด', 'บางกรวย', 'บางใหญ่', 'ไทรน้อย', 'บัวทอง', 'คลองข่อย'],
+    'นราธิวาส': ['เมืองนราธิวาส', 'ตากใบ', 'บาเจาะ', 'ระแงะ', 'รือเสาะ', 'สุไหงปาดี', 'สุไหงโก-ลก'],
+    'น่าน': ['เมืองน่าน', 'เชียงกลาง', 'นาน้อย', 'นาหมื่น', 'บ่อเกลือ', 'ปัว', 'สันติสุข', 'ท่าวังผา'],
+    'บึงกาฬ': ['เมืองบึงกาฬ', 'เซกา', 'ปากคาด', 'บึงโขงหลง', 'โซ่พิสัย', 'สว่างแดนดิน'],
+    'บุรีรัมย์': ['เมืองบุรีรัมย์', 'คูเมือง', 'บ้านกรวด', 'นางรอง', 'ประโคนชัย', 'ลำปลายมาศ', 'สตึก', 'เฉลิมพระเกียรติ'],
+    'ปทุมธานี': ['เมืองปทุมธานี', 'คลองหลวง', 'ธัญบุรี', 'ลำลูกกา', 'หนองเสือ', 'สามโคก', 'วังน้อย'],
+    'ประจวบคีรีขันธ์': ['เมืองประจวบคีรีขันธ์', 'หัวหิน', 'ปราณบุรี', 'บ่อนอก', 'ดอนยายหนู', 'เขาเต่า'],
+    'ปราจีนบุรี': ['เมืองปราจีนบุรี', 'ศรีมหาโพธิ', 'บ้านสร้าง', 'กบินทร์บุรี', 'ประจันตคาม', 'นาดี'],
+    'ปัตตานี': ['เมืองปัตตานี', 'หนองจิก', 'ทุ่งยางแดง', 'แม่ลาน', 'ปะนาเระ', 'มายอ', 'ยะหา', 'เบตง'],
+    'พระนครศรีอยุธยา': ['เมืองพระนครศรีอยุธยา', 'บางปะอิน', 'บางไทร', 'บางบาล', 'พระนครศรีอยุธยา', 'อุทัย', 'ลาดบัวหลวง'],
+    'พะเยา': ['เมืองพะเยา', 'เชียงคำ', 'ดอกคำใต้', 'แม่ใจ', 'ปง', 'ร้องกวาง', 'วังเหนือ'],
+    'พังงา': ['เมืองพังงา', 'เกาะยาว', 'ตะกั่วป่า', 'คุระบุรี', 'พนม', 'ลำแก่น'],
+    'พัทลุง': ['เมืองพัทลุง', 'กงหรา', 'เขาชัยสน', 'ปากพะยูน', 'ศรีบรรพต', 'สุราษฎร์ธานี'],
+    'พิจิตร': ['เมืองพิจิตร', 'บึงนาราง', 'โพธิ์ประทับช้าง', 'วังทรายพูน', 'ทับคล้อ', 'สามง่าม'],
+    'พิษณุโลก': ['เมืองพิษณุโลก', 'บางระกำ', 'บางกระทุ่ม', 'บึงพระ', 'วังทอง', 'นครไทย', 'ชาติตระการ'],
+    'เพชรบุรี': ['เมืองเพชรบุรี', 'ชะอำ', 'หัวหิน', 'ท่ายาง', 'บ้านลาด', 'หนองแก'],
+    'เพชรบูรณ์': ['เมืองเพชรบูรณ์', 'หล่มสัก', 'ด่านช้าง', 'เขาค้อ', 'หนองไผ่', 'บึงสามพัน'],
+    'แพร่': ['เมืองแพร่', 'ร้องกวาง', 'หนองม่วง', 'สูงเม่น', 'ลับแล', 'เด่นชัย'],
+    'ภูเก็ต': ['เมืองภูเก็ต', 'กะทู้', 'ถลาง', 'ป่าตอง', 'ราไวย์', 'วิชิต'],
+    'มหาสารคาม': ['เมืองมหาสารคาม', 'แกดำ', 'กุดรัง', 'นาเชือก', 'บรบือ', 'เชียงยืน'],
+    'มุกดาหาร': ['เมืองมุกดาหาร', 'ดอนตาล', 'คำชะอี', 'หนองสูง', 'มุกดาหาร', 'นิคมคำสร้อย'],
+    'แม่ฮ่องสอน': ['เมืองแม่ฮ่องสอน', 'ปาย', 'แม่สะเรียง', 'แม่ลาน้อย', 'สบเมย', 'เมืองปอน'],
+    'ยโสธร': ['เมืองยโสธร', 'กุดชุม', 'ค้อวัง', 'ทรายมูล', 'ป่าติ้ว', 'ยางชุมน้อย'],
+    'ยะลา': ['เมืองยะลา', 'เบตง', 'บันนังสตา', 'แม่กลอง', 'ยะหา', 'รามัน'],
+    'ร้อยเอ็ด': ['เมืองร้อยเอ็ด', 'จตุรพักตร์', 'ทุ่งเขาหลวง', 'หนองพอก', 'เสลภูมิ', 'โพนทอง'],
+    'ระนอง': ['เมืองระนอง', 'กระบุรี', 'ละอุ่น', 'บางริ้น', 'หาดส้มแป้น'],
+    'ระยอง': ['เมืองระยอง', 'บ้านฉาง', 'ปลวกแดง', 'พัทยา', 'เขาชีจรรย์'],
+    'ราชบุรี': ['เมืองราชบุรี', 'จอมบึง', 'ดำเนินสะดวก', 'ปากท่อ', 'โพธาราม', 'บ้านโป่ง'],
+    'ลพบุรี': ['เมืองลพบุรี', 'บ้านหมี่', 'ลำสนธิ', 'ท่าวุ้ง', 'โคกสำโรง', 'พัฒนานิคม'],
+    'ลำปาง': ['เมืองลำปาง', 'เขลางค์นคร', 'งาว', 'เสริมงาม', 'แม่ทะ', 'ลำปลายมาศ'],
+    'ลำพูน': ['เมืองลำพูน', 'บ้านธิ', 'ป่าซาง', 'ลี้', 'ทาเหนือ', 'ทาตรัง'],
+    'เลย': ['เมืองเลย', 'เชียงคาน', 'ด่านซ้าย', 'นาแห้ว', 'ภูหลวง', 'ท่าลี่'],
+    'ศรีสะเกษ': ['เมืองศรีสะเกษ', 'กันทรลักษ์', 'ขุขันธ์', 'ปราสาท', 'ราษีไศล', 'วังหิน'],
+    'สกลนคร': ['เมืองสกลนคร', 'กุสุมาลย์', 'พรรณานิคม', 'ภูพาน', 'วารินชำราบ', 'เจริญศิลป์'],
+    'สงขลา': ['เมืองสงขลา', 'หาดใหญ่', 'คอหงส์', 'บางกล่ำ', 'สิงหนคร', 'นาทวี'],
+    'สตูล': ['เมืองสตูล', 'ละงู', 'ควนโดน', 'ท่าแพ', 'สำนักขาม'],
+    'สมุทรปราการ': ['เมืองสมุทรปราการ', 'บางพลี', 'พระประแดง', 'ทรงคนอง', 'บางเสาธง'],
+    'สมุทรสงคราม': ['เมืองสมุทรสงคราม', 'บางคนที', 'อัมพวา', 'บ้านแหลม'],
+    'สมุทรสาคร': ['เมืองสมุทรสาคร', 'บ้านแพ้ว', 'กระทุ่มแบน', 'บางน้ำเปรี้ยว'],
+    'สระแก้ว': ['เมืองสระแก้ว', 'อรัญประเทศ', 'คลองหาด', 'เขาฉกรรจ์', 'วังสมบูรณ์'],
+    'สระบุรี': ['เมืองสระบุรี', 'แก่งคอย', 'บ้านหมอ', 'หนองแค', 'วิหารแดง'],
+    'สิงห์บุรี': ['เมืองสิงห์บุรี', 'ค่ายบางระจัน', 'บางระจัน', 'ท่าช้าง'],
+    'สุโขทัย': ['เมืองสุโขทัย', 'คีรีมาศ', 'บ้านด่านลานหอย', 'ศรีสำโรง', 'สวรรคโลก'],
+    'สุพรรณบุรี': ['เมืองสุพรรณบุรี', 'เดิมบางนางบวช', 'ด่านช้าง', 'สามชุก', 'อู่ทอง'],
+    'สุราษฎร์ธานี': ['เมืองสุราษฎร์ธานี', 'กาญจนดิษฐ์', 'ดอนสัก', 'บ้านตาขุน', 'พุนพิน', 'เกาะสมุย', 'เกาะพะงัน'],
+    'สุรินทร์': ['เมืองสุรินทร์', 'ชุมพลบุรี', 'คูเมือง', 'ปราสาท', 'รัตนบุรี', 'ลำดวน'],
+    'หนองคาย': ['เมืองหนองคาย', 'ท่าบ่อ', 'โพนพิสัย', 'สระใคร', 'หนองกุง'],
+    'หนองบัวลำภู': ['เมืองหนองบัวลำภู', 'โนนสัง', 'หนองบัว', 'บ้านค่าย'],
+    'อ่างทอง': ['เมืองอ่างทอง', 'โพธิ์ทอง', 'วิเศษชัยชาญ', 'ป่าโมก', 'สามโก้'],
+    'อำนาจเจริญ': ['เมืองอำนาจเจริญ', 'ชานุมาน', 'ปทุมราชวงศา', 'พนา', 'ลืออำนาจ'],
+    'อุดรธานี': ['เมืองอุดรธานี', 'กุดั่น', 'บ้านดุง', 'หนองหาน', 'โนนสะอาด'],
+    'อุตรดิตถ์': ['เมืองอุตรดิตถ์', 'ตรอน', 'บ้านโคก', 'น้ำปาด', 'พิชัย'],
+    'อุทัยธานี': ['เมืองอุทัยธานี', 'บ้านไร่', 'หนองฉาง', 'สว่างอารมณ์', 'อุทัยเก่า'],
+    'อุบลราชธานี': ['เมืองอุบลราชธานี', 'วารินชำราบ', 'พิบูลมังสาหาร', 'ตาลสุม', 'เขมราฐ']
+};
+
+function updateAmphurOptions(type) {
+    const provinceSelect = document.getElementById(type + '-province');
+    const amphurSelect = document.getElementById(type + '-amphur');
+    const province = provinceSelect.value;
+    amphurSelect.innerHTML = '<option value="">เลือกอำเภอ</option>';
+    if (provinceToAmphur[province]) {
+        provinceToAmphur[province].forEach(amphur => {
+            const option = document.createElement('option');
+            option.value = amphur;
+            option.textContent = amphur;
+            amphurSelect.appendChild(option);
+        });
+    }
+}
+</script>
+</body>
+</html>
