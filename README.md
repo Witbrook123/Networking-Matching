@@ -1446,9 +1446,9 @@
                         tr.innerHTML = `
                             <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${rowIndex}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.reg}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.type}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.zone}</td>
-                            <td style="padding: 0.6rem 0.5rem;">&nbsp&nbsp&nbsp${row.province}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.type}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.zone}</td>
+                            <td style="padding: 0.6rem 0.5rem;">${row.province}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.product}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.plant}</td>
                             <td style="padding: 0.6rem 0.5rem;">${row.job}</td>
